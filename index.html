@@ -245,7 +245,7 @@
             );
         }
         // ----------------- COMPONENTE COFRESORPRESA (nuevo) -----------------
-        function CofreSorpresa() {
+       /* function CofreSorpresa() {
             const [premio, setPremio] = useState('');
             const listaPremios = ['💎 100 gemas', '💰 500 monedas', '❌ Nada... sigue intentando', '🃏 Carta legendaria', '✨ Poción de velocidad'];
 
@@ -282,6 +282,72 @@
                         Abrir cofre
                     </button>
                     {premio && <p style={{ marginTop: '0.5rem', fontWeight: 'bold', color: '#92400e' }}>¡Obtuviste: {premio}!</p>}
+                </div>
+            );
+        }*/
+        // VERSIÓN 2 COFRESORPRESA MAS ESTILO + FUNCIONALIDADES
+        // Modifica el componente CofreSorpresa para recibir cartas y seleccionar una legendaria real:
+        function CofreSorpresa({ cartas }) {
+            const [premio, setPremio] = useState('');
+            const [imagenPremio, setImagenPremio] = useState('');
+            const [esLegendaria, setEsLegendaria] = useState(false);
+            const [nombreCarta, setNombreCarta] = useState('');
+
+            // Filtramos las cartas legendarias disponibles en la API
+            const cartasLegendarias = cartas.filter(c => c.rarity === 'legendary');
+
+            // Lista de premios (emojis para los que no son legendarias)
+            const listaPremios = [
+                { nombre: '💎 100 gemas', imagen: 'https://cdn-icons-png.flaticon.com/512/1982/2950373.png', esLegendaria: false },
+                { nombre: '💰 500 monedas', imagen: 'https://cdn-icons-png.flaticon.com/512/2331/2331970.png', esLegendaria: false },
+                { nombre: '❌ Nada... sigue intentando', imagen: 'https://cdn-icons-png.flaticon.com/512/753/753345.png', esLegendaria: false },
+                { nombre: '✨ Poción de velocidad', imagen: 'https://cdn-icons-png.flaticon.com/512/3094/3094823.png', esLegendaria: false }
+            ];
+
+            const abrirCofre = () => {
+                // Forzamos una alta probabilidad de carta legendaria para probar (50%)
+                const esCartaLegendaria = Math.random() < 0.5; // Cambia a 0.1 para normalizar
+
+                if (esCartaLegendaria && cartasLegendarias.length > 0) {
+                    // Carta legendaria aleatoria
+                    const cartaAleatoria = cartasLegendarias[Math.floor(Math.random() * cartasLegendarias.length)];
+                    setPremio(`🃏 ${cartaAleatoria.name} (Legendaria)`);
+                    setImagenPremio(cartaAleatoria.iconUrls.medium);
+                    setEsLegendaria(true);
+                    setNombreCarta(cartaAleatoria.name);
+                    console.log('🔥 Carta legendaria real:', cartaAleatoria.name);
+                } else {
+                    // Premio normal
+                    const indiceAleatorio = Math.floor(Math.random() * listaPremios.length);
+                    const premioElegido = listaPremios[indiceAleatorio];
+                    setPremio(premioElegido.nombre);
+                    setImagenPremio(premioElegido.imagen);
+                    setEsLegendaria(false);
+                    setNombreCarta('');
+                }
+            };
+
+            return (
+                <div style={{ textAlign: 'center', margin: '1rem auto', padding: '1rem', backgroundColor: '#f3e8ff', borderRadius: '16px', maxWidth: '400px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                    <h3>🎁 Cofre Sorpresa</h3>
+                    <button onClick={abrirCofre} style={{ borderRadius: '8px', padding: '8px 16px', fontSize: '1rem', cursor: 'pointer', border: 'none', backgroundColor: '#fbbf24', color: '#451a03', fontWeight: 'bold', transition: 'transform 0.2s, background-color 0.2s' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.backgroundColor = '#9333ea'; e.currentTarget.style.color = 'white'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.backgroundColor = '#fbbf24'; e.currentTarget.style.color = '#451a03'; }}>
+                        Abrir cofre
+                    </button>
+                    
+                    {premio && (
+                        <div style={{ marginTop: '1rem', padding: '0.5rem', borderTop: '1px solid #e5e7eb' }}>
+                            <img 
+                                src={imagenPremio} 
+                                alt={premio} 
+                                className={esLegendaria ? "fuego" : ""}
+                                style={{ width: '80px', height: '80px', objectFit: 'contain', marginBottom: '0.5rem', transition: 'all 0.3s' }}
+                                onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/80?text=No+Image'; }}
+                            />
+                            <p style={{ fontWeight: 'bold', color: '#6b21a5', margin: 0 }}>¡Obtuviste: {premio}!</p>
+                        </div>
+                    )}
                 </div>
             );
         }
@@ -329,8 +395,8 @@
                                 />
                             </label>
                         </div>
-
-                        <CofreSorpresa />
+                        {/* Hay que ponerle cartas={cartas} si o si*/}
+                        <CofreSorpresa cartas={cartas}/>
                         <div id="cards-container">
                             {cartasMostradas.map(carta => (
                                 <CartaClashRoyale 
