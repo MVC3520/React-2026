@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Demo React - Clash Royale</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script defer type="text/babel">
+        const { useState, useEffect } = React;
+
+        // 1. Configuraciones de la API (Afuera de los componentes para que sea global)
+        const API_KEY_2 = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6IjA2MTkxZjg3LTA1NDktNGYxOC1iNTM2LTc5MDdlYWU5NTE2YiIsImlhdCI6MTc3MTYwMzI5Miwic3ViIjoiZGV2ZWxvcGVyLzg5ZGIxNzRiLTk4M2Mt MWQ0NS00ZDY2LTY1ZmM0OGY3YjA4NiIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyI0NS43OS4yMTguNzkiXSwidHlwZSI6ImNsaWVudCJ9XX0.Y6p-6p-ZQeEgZX3ATQBBs4Uz2myH8seCKMMrR2T2F05ihXoaLXcdC4sCJs_ChyOxwq076s_rSR01Qp6sjD5UDQ";
+
+        const API_CONFIG = {
+            BASE_URL: 'https://proxy.royaleapi.dev/v1/cards',
+            HEADERS: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + API_KEY_2
+            }
+        };
+
+        const rarezas = {
+            common: "Común",
+            rare: "Especial",
+            epic: "Epíca",
+            legendary: "Legendaria",
+            champion: "Campeon"
+        };
+
+        // 2. Nuestro Componente Carta
+        function CartaClashRoyale({ nombre, nivelMax, rareza, urlFoto, urlHeroe, urlEvo }) {
+            const [vistaActual, setVistaActual] = useState("normal");
+
+            let urlImagen = urlFoto;
+            if (vistaActual === "evo") {
+                urlImagen = urlEvo;
+            } else if (vistaActual === "heroe") {
+                urlImagen = urlHeroe;
+            }
+            
+            return (
+                <div className="card">
+                    <h3>{nombre}</h3>
+                    {/* Corregido: antes decía {nivel}, la prop es {nivelMax} */}
+                    <p>Nivel Máximo: {nivelMax}</p> 
+                    <p>Rareza: {rareza}</p>
+                    
+                    <img src={urlImagen} alt={nombre} />
+                    
+                    <div className="buttons-container">
+                        {/* Este boton existe solo si la url de la evo Existe*/}
+                        {urlEvo && (
+                            <button 
+                                className="evo-button"
+                                onClick={() => setVistaActual(vistaActual === "evo" ? "normal" : "evo")}
+                            >
+                                {vistaActual === "evo" ? "Volver" : "Ver Evo"}
+                            </button>
+                        )}
+
+                        {urlHeroe && (
+                            <button 
+                                className="heroe-button"
+                                onClick={() => setVistaActual(vistaActual === "heroe" ? "normal" : "heroe")}
+                            >
+                                {vistaActual === "heroe" ? "Volver" : "Ver Héroe"}
+                            </button>
+                        )}
+                    </div>
+                </div>
+            );
+
+        }
+        // ----------------- COMPONENTE HEADER (nuevo) -----------------
+        function Header({ cartas }) {
+            const total = cartas.length;
+            const conEvolucion = cartas.filter(carta => carta.iconUrls?.evolutionMedium).length;
+            const conHeroe = cartas.filter(carta => carta.iconUrls?.heroMedium).length;
+
+            return (
+                <header style={{ textAlign: 'center', marginBottom: '1rem' }}>
+                    <h1>🏆 Enciclopedia de Clash Royale (React)</h1>
+                    <div style={{ backgroundColor: '#b1c5f4', padding: '0.5rem', borderRadius: '8px' }}>
+                        <p><strong>Estadísticas en vivo:</strong></p>
+                        <p>
+                        <span style={{ color: '#2563eb', fontWeight: 'bold'}}> Total cartas: {total}</span>  
+                        <span style={{ color: '#9333ea', fontWeight: 'bold',marginLeft: '1.5rem' }}> Con evolución: {conEvolucion}</span>  
+                        <span style={{ color: '#d97706', fontWeight: 'bold',marginLeft: '1.5rem' }}> Con héroe: {conHeroe}</span>
+                        </p>
+                    </div>
+                </header>
+            );
+        }
+
+        // ----------------- COMPONENTE FOOTER (nuevo) -----------------
+        function Footer() {
+            const añoActual = new Date().getFullYear();
+            return (
+                <footer style={{ textAlign: 'center', padding: '1rem', marginTop: '2rem', borderTop: '1px solid #ccc' }}>
+                    <p>© {añoActual} Enciclopedia Clash Royale. Todos los derechos reservados. <span style={{ fontWeight: 'bold', color: 'blue' }}>Miguel Victorio Cabrera</span></p>
+                </footer>
+            );
+        }
+
+        // ----------------- COMPONENTE COFRESORPRESA (nuevo) -----------------
+        function CofreSorpresa() {
+            const [premio, setPremio] = useState('');
+            const listaPremios = ['💎 100 gemas', '💰 500 monedas', '❌ Nada... sigue intentando', '🃏 Carta legendaria', '✨ Poción de velocidad'];
+
+            const abrirCofre = () => {
+                const indiceAleatorio = Math.floor(Math.random() * listaPremios.length);
+                setPremio(listaPremios[indiceAleatorio]);
+            };
+
+            return (
+                <div style={{ textAlign: 'center', margin: '1rem auto', padding: '1rem', backgroundColor: '#ffffff',border: '1px solid #e5e7eb', borderRadius: '16px', maxWidth: '400px' }}>
+                    <h3>🎁 Cofre Sorpresa 🎁</h3>
+                    <button 
+                        onClick={abrirCofre} 
+                         style={{ 
+                            borderRadius: '8px', 
+                            padding: '8px 16px', 
+                            fontSize: '1rem', 
+                            cursor: 'pointer',
+                            border: 'none',
+                            backgroundColor: '#fbbf24',
+                            color: 'white',
+                            fontWeight: 'bold',
+                            transition: 'transform 0.2s, background-color 0.2s'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'scale(1.1)';
+                            e.currentTarget.style.backgroundColor = '#9333ea'; // violeta
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'scale(1)';
+                            e.currentTarget.style.backgroundColor = '#fbbf24';
+                        }}
+                    >
+                        Abrir cofre
+                    </button>
+                    {premio && <p style={{ marginTop: '0.5rem', fontWeight: 'bold', color: '#92400e' }}>¡Obtuviste: {premio}!</p>}
+                </div>
+            );
+        }
+        // 3. Componente Principal App
+        function App() {
+            // Guardamos TODAS las cartas que vienen de la API
+            const [cartas, setCartas] = useState([]);
+            // Límite de cartas a mostrar (por defecto 35)
+            const [limite, setLimite] = useState(35);
+            // Las cartas que realmente se muestran (derivado del estado)
+            const cartasMostradas = cartas.slice(0, limite);
+
+            useEffect(() => {
+                async function obtenerCartas() {
+                    try {
+                        const response = await fetch(API_CONFIG.BASE_URL, {
+                            headers: API_CONFIG.HEADERS
+                        });
+                        const data = await response.json();
+                        // Guardamos TODAS las cartas (sin recortar)
+                        setCartas(data.items);
+                    } catch(error) {
+                        console.log(error);
+                    }
+                }
+                obtenerCartas();
+            }, []); // Solo se ejecuta una vez al montar
+
+            return (
+                <>
+                    {/* Pasamos las cartasMostradas para que las estadísticas se actualicen */}
+                    <Header cartas={cartasMostradas} />
+                    <main>
+                        {/* Control deslizante para modificar la cantidad de cartas */}
+                        <div style={{ textAlign: 'center', margin: '1rem' }}>
+                            <label>
+                                <strong>Mostrar {limite} cartas (de {cartas.length} disponibles)</strong>
+                                <input 
+                                    type="range" 
+                                    min="1" 
+                                    max={cartas.length || 1} 
+                                    value={limite} 
+                                    onChange={(e) => setLimite(Number(e.target.value))}
+                                    style={{ marginLeft: '10px', width: '200px' }}
+                                />
+                            </label>
+                        </div>
+
+                        <CofreSorpresa />
+                        <div id="cards-container">
+                            {cartasMostradas.map(carta => (
+                                <CartaClashRoyale 
+                                    key={carta.name} 
+                                    nombre={carta.name} 
+                                    nivelMax={carta.maxLevel} 
+                                    rareza={rarezas[carta.rarity]} 
+                                    urlFoto={carta.iconUrls.medium} 
+                                    urlHeroe={carta.iconUrls.heroMedium || ""} 
+                                    urlEvo={carta.iconUrls.evolutionMedium || ""}
+                                />
+                            ))}
+                        </div>
+                    </main>
+                    <Footer />
+                </>
+            );
+        }
+
+        // 4. Renderizado
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</head>
+<body>
+    <div id="root">
+    </div>
+</body>
+</html>
