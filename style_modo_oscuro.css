@@ -1,0 +1,196 @@
+
+        /* ========== TEMAS: CLARO Y OSCURO ========== */
+        /* Variables para modo claro */
+        :root {
+            --bg-body: #f0f2f5;
+            --bg-header-stats: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #334155;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --card-shadow: 0 20px 30px -12px rgba(0,0,0,0.1);
+            --card-border: 1px solid rgba(0,0,0,0.05);
+            --button-bg: #2c3e66;
+            --button-text: white;
+            --cofre-bg: #fef3c7;
+            --cofre-border: #d97706;
+            --footer-bg: #ffffff;
+            --footer-text: #4b5563;
+            --map-border: #e5e7eb;
+        }
+
+        /* Modo oscuro */
+        body.dark-mode {
+            --bg-body: linear-gradient(145deg, #0a1424 0%, #060c18 100%);
+            --bg-header-stats: #b1c5f4;
+            --text-primary: #f3e9c0;
+            --text-secondary: #cbd5e1;
+            --card-bg: rgba(20, 30, 45, 0.92);
+            --card-shadow: 0 20px 30px -12px rgba(0,0,0,0.6);
+            --card-border: 0 0 0 1px rgba(255,215,0,0.25);
+            --button-bg: #2c3e66;
+            --button-text: white;
+            --cofre-bg: #f3e8ff;
+            --cofre-border: #9333ea;
+            --footer-bg: #f9fafb;
+            --footer-text: #4b5563;
+            --map-border: #e5e7eb;
+        }
+
+        /* Aplicación de variables */
+        body {
+            background: var(--bg-body);
+            font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.2s ease;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Estilo de cartas con variables */
+        .card {
+            background: var(--card-bg);
+            border-radius: 28px;
+            padding: 1.2rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            text-align: center;
+            color: var(--text-primary);
+            border: var(--card-border);
+        }
+        .card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 30px 40px -12px black, 0 0 0 2px #ffd966;
+        }
+        .card h3 {
+            font-size: 1.3rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #FFE6B0, #FFB347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        .card img {
+            width: 100%;
+            max-width: 110px;
+            height: auto;
+            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.5));
+            margin: 10px 0;
+        }
+        .buttons-container {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .evo-button, .heroe-button {
+            background: var(--button-bg);
+            border: none;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-weight: bold;
+            color: var(--button-text);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.8rem;
+        }
+        .evo-button:hover, .heroe-button:hover {
+            background: #ffb347;
+            color: #1a2a3a;
+            transform: scale(1.05);
+        }
+        #cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.8rem;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        main {
+            padding: 0 1rem;
+        }
+        /* Estilos del cofre */
+        .cofre-container {
+            text-align: center;
+            margin: 1rem auto;
+            padding: 1rem;
+            background-color: var(--cofre-bg);
+            border-radius: 16px;
+            max-width: 400px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background 0.2s;
+        }
+        /* Botón de cambio de tema */
+        .theme-toggle {
+            background: #2d3748;
+            border: none;
+            border-radius: 40px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            color: white;
+        }
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            background: #4a5568;
+        }
+        /* Ajustes adicionales para el header en modo claro/oscuro */
+        header h1 {
+            margin: 0;
+            color: var(--text-primary);
+        }
+        .stats-bar {
+            background-color: var(--bg-header-stats);
+            padding: 0.5rem;
+            border-radius: 8px;
+            color: var(--text-secondary);
+        }
+        body.dark-mode .stats-bar {
+            background: linear-gradient(145deg, #1e3a5f 0%, #0f172a 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        /* Footer también se adapta */
+        footer {
+            background-color: var(--footer-bg);
+            border-top: 1px solid var(--map-border);
+        }
+        footer a {
+            color: #3b82f6;
+        }
+        .map-container {
+            margin-bottom: 2rem;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        /* EFECTO FUEGO PARA CARTAS LEGENDARIAS */
+        .fuego {
+            animation: fuegoAnim 0.6s infinite alternate;
+            filter: drop-shadow(0 0 8px orange) drop-shadow(0 0 16px red);
+        }
+
+        @keyframes fuegoAnim {
+            0% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 5px orange) drop-shadow(0 0 10px red);
+            }
+            100% {
+                transform: scale(1.1);
+                filter: drop-shadow(0 0 15px orange) drop-shadow(0 0 25px red);
+            }
+        }
+        body.dark-mode header {
+            background: linear-gradient(to right, #162033 0%, #24344d 50%, #3b5375 100%);
+            /*padding: 10px 0;*/
+            /*border-bottom: 1px solid rgba(255,255,255,0.1);*/
+        }
+        body.dark-mode .color{
+            color:white;
+        }
+ 

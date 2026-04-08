@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Demo React - Clash Royale | Modo Claro/Oscuro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="stylesheet" href="style_modo_oscuro.css">
+
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // ---------- CONFIGURACIÓN API ----------
+        const API_KEY_2 = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6IjA2MTkxZjg3LTA1NDktNGYxOC1iNTM2LTc5MDdlYWU5NTE2YiIsImlhdCI6MTc3MTYwMzI5Miwic3ViIjoiZGV2ZWxvcGVyLzg5ZGIxNzRiLTk4M2MtMWQ0NS00ZDY2LTY1ZmM0OGY3YjA4NiIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyI0NS43OS4yMTguNzkiXSwidHlwZSI6ImNsaWVudCJ9XX0.Y6p-6p-ZQeEgZX3ATQBBs4Uz2myH8seCKMMrR2T2F05ihXoaLXcdC4sCJs_ChyOxwq076s_rSR01Qp6sjD5UDQ";
+
+        const API_CONFIG = {
+            BASE_URL: 'https://proxy.royaleapi.dev/v1/cards',
+            HEADERS: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + API_KEY_2
+            }
+        };
+
+        const rarezas = {
+            common: "Común",
+            rare: "Especial",
+            epic: "Epíca",
+            legendary: "Legendaria",
+            champion: "Campeon"
+        };
+
+        // ---------- COMPONENTE CARTA ----------
+        function CartaClashRoyale({ nombre, nivelMax, rareza, urlFoto, urlHeroe, urlEvo }) {
+            const [vistaActual, setVistaActual] = useState("normal");
+            let urlImagen = urlFoto;
+            if (vistaActual === "evo") urlImagen = urlEvo;
+            else if (vistaActual === "heroe") urlImagen = urlHeroe;
+            
+            return (
+                <div className="card">
+                    <h3>{nombre}</h3>
+                    <p>Nivel Máximo: {nivelMax}</p>
+                    <p>Rareza: {rareza}</p>
+                    <img src={urlImagen} alt={nombre} />
+                    <div className="buttons-container">
+                        {urlEvo && (
+                            <button className="evo-button" onClick={() => setVistaActual(vistaActual === "evo" ? "normal" : "evo")}>
+                                {vistaActual === "evo" ? "Volver" : "Ver Evo"}
+                            </button>
+                        )}
+                        {urlHeroe && (
+                            <button className="heroe-button" onClick={() => setVistaActual(vistaActual === "heroe" ? "normal" : "heroe")}>
+                                {vistaActual === "heroe" ? "Volver" : "Ver Héroe"}
+                            </button>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        // ---------- HEADER (con botón de cambio de tema) ----------
+        function Header({ cartas, toggleTheme, isDarkMode }) {
+            const total = cartas.length;
+            const conEvolucion = cartas.filter(carta => carta.iconUrls?.evolutionMedium).length;
+            const conHeroe = cartas.filter(carta => carta.iconUrls?.heroMedium).length;
+
+            return (
+                <header style={{ textAlign: 'center', marginBottom: '1rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', marginBottom: '0.5rem' }}>
+                        <div style={{ justifySelf: 'start', marginLeft:'10px' }}>
+                            <img class="logo" src="Logo_3F_gold_premio.png" alt="Logo Tecno3F" style={{ height: '50px', width: 'auto' }} />
+                        </div>
+                        <h1 style={{ margin: 0 }}>🏆 Enciclopedia de Clash Royale (React)</h1>
+                        <div style={{ justifySelf: 'end', marginRight: '10px' }}>
+                            <button onClick={toggleTheme} className="theme-toggle">
+                                {isDarkMode ? '☀️ Modo Claro' : '🌙 Modo Oscuro'}
+                            </button>
+                        </div>
+                    </div>
+                    <div className="stats-bar">
+                        <p><strong class="pepe">Estadísticas en vivo:</strong></p>
+                        <p>
+                            <span style={{ color: '#2563eb', fontWeight: 'bold'}}> Total cartas: {total}</span>  
+                            <span style={{ color: '#9333ea', fontWeight: 'bold', marginLeft: '1.5rem' }}> Con evolución: {conEvolucion}</span>  
+                            <span style={{ color: '#d97706', fontWeight: 'bold', marginLeft: '1.5rem' }}> Con héroe: {conHeroe}</span>
+                        </p>
+                    </div>
+                </header>
+            );
+        }
+
+        // ---------- FOOTER (igual, pero con variables CSS) ----------
+        function Footer() {
+            const añoActual = new Date().getFullYear();
+            return (
+                <footer style={{
+                    padding: '2rem 1rem',
+                    marginTop: '3rem',
+                    fontFamily: 'system-ui, -apple-system, sans-serif'
+                }}>
+                    <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 1rem' }}>
+                        <div style={{ textAlign: 'center', marginBottom: '1rem', fontSize: '0.85rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--footer-text)' }}>
+                            📍 Estamos aquí
+                        </div>
+                        <div className="map-container">
+                            <iframe 
+                                sandbox="allow-scripts allow-same-origin" 
+                                style={{ width: '100%', height: '280px', border: 'none', display: 'block' }} 
+                                src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d13136.280852428928!2d-58.541002000000006!3d-34.602386!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bcb7d9268e25e9%3A0x32834d60383b6391!2sTecno3F!5e0!3m2!1ses!2sus!4v1775226638350!5m2!1ses!2sus"
+                                title="Mapa Tecno3F"
+                                loading="lazy"
+                                referrerPolicy="no-referrer">
+                            </iframe>
+                        </div>
+                        <div style={{ maxWidth: '800px', margin: '0 auto 2rem auto', textAlign: 'center', fontSize: '0.9rem', lineHeight: '1.5', color: 'var(--footer-text)' }}>
+                            <p style={{ margin: 0 }}>
+                                Somos una iniciativa de la Secretaría de Trabajo y Producción de la{' '}
+                                <a href="https://www.tresdefebrero.gov.ar/" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '500' }}>
+                                    Municipalidad de Tres de Febrero
+                                </a>
+                                {' '}que busca mejorar las condiciones de empleabilidad a través de la formación profesional. Vamos a convertir a Tres de Febrero en el distrito de la Innovación y el Conocimiento. Queremos que seas parte de esta transformación tecnológica.
+                            </p>
+                        </div>
+                        <div style={{ borderTop: '1px solid var(--map-border)', paddingTop: '1.5rem', textAlign: 'center', fontSize: '0.75rem', color: 'var(--footer-text)' }}>
+                            <p style={{ margin: 0 }}>
+                                © {añoActual} Enciclopedia Clash Royale. Todos los derechos reservados. 
+                                <span style={{ fontWeight: '500', color: '#3b82f6' }}> Miguel Victorio Cabrera</span>
+                            </p>
+                        </div>
+                    </div>
+                </footer>
+            );
+        }
+
+        // ---------- COMPONENTE COFRESORPRESA ----------
+        function CofreSorpresa({ cartas }) {
+            const [premio, setPremio] = useState('');
+            const [imagenPremio, setImagenPremio] = useState('');
+            const [esLegendaria, setEsLegendaria] = useState(false);
+            const [nombreCarta, setNombreCarta] = useState('');
+
+            const cartasLegendarias = cartas.filter(c => c.rarity === 'legendary');
+            const listaPremios = [
+                { nombre: '💎 100 gemas', imagen: 'https://cdn-icons-png.flaticon.com/512/1982/2950373.png', esLegendaria: false },
+                { nombre: '💰 500 monedas', imagen: 'https://cdn-icons-png.flaticon.com/512/2331/2331970.png', esLegendaria: false },
+                { nombre: '❌ Nada... sigue intentando', imagen: 'https://cdn-icons-png.flaticon.com/512/753/753345.png', esLegendaria: false },
+                { nombre: '✨ Poción de velocidad', imagen: 'https://cdn-icons-png.flaticon.com/512/3094/3094823.png', esLegendaria: false }
+            ];
+
+            const abrirCofre = () => {
+                const esCartaLegendaria = Math.random() < 0.5;
+                if (esCartaLegendaria && cartasLegendarias.length > 0) {
+                    const cartaAleatoria = cartasLegendarias[Math.floor(Math.random() * cartasLegendarias.length)];
+                    setPremio(`🃏 ${cartaAleatoria.name} (Legendaria)`);
+                    setImagenPremio(cartaAleatoria.iconUrls.medium);
+                    setEsLegendaria(true);
+                    setNombreCarta(cartaAleatoria.name);
+                    console.log('🔥 Carta legendaria real:', cartaAleatoria.name);
+                } else {
+                    const indiceAleatorio = Math.floor(Math.random() * listaPremios.length);
+                    const premioElegido = listaPremios[indiceAleatorio];
+                    setPremio(premioElegido.nombre);
+                    setImagenPremio(premioElegido.imagen);
+                    setEsLegendaria(false);
+                    setNombreCarta('');
+                }
+            };
+
+            return (
+                <div className="cofre-container">
+                    <h3>🎁 Cofre Sorpresa</h3>
+                    <button onClick={abrirCofre} style={{ borderRadius: '8px', padding: '8px 16px', fontSize: '1rem', cursor: 'pointer', border: 'none', backgroundColor: '#fbbf24', color: '#451a03', fontWeight: 'bold', transition: 'transform 0.2s, background-color 0.2s' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.backgroundColor = '#9333ea'; e.currentTarget.style.color = 'white'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.backgroundColor = '#fbbf24'; e.currentTarget.style.color = '#451a03'; }}>
+                        Abrir cofre
+                    </button>
+                    
+                    {premio && (
+                        <div style={{ marginTop: '1rem', padding: '0.5rem', borderTop: '1px solid #e5e7eb' }}>
+                            <img 
+                                src={imagenPremio} 
+                                alt={premio} 
+                                className={esLegendaria ? "fuego" : ""}
+                                style={{ width: '80px', height: '80px', objectFit: 'contain', marginBottom: '0.5rem', transition: 'all 0.3s' }}
+                                onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/80?text=No+Image'; }}
+                            />
+                            <p style={{ fontWeight: 'bold', color: '#6b21a5', margin: 0 }}>¡Obtuviste: {premio}!</p>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // ---------- APP PRINCIPAL (con estado del tema) ----------
+        function App() {
+            const [cartas, setCartas] = useState([]);
+            const [limite, setLimite] = useState(35);
+            const [isDarkMode, setIsDarkMode] = useState(false); // Por defecto modo claro (false)
+            const cartasMostradas = cartas.slice(0, limite);
+
+            useEffect(() => {
+                async function obtenerCartas() {
+                    try {
+                        const response = await fetch(API_CONFIG.BASE_URL, { headers: API_CONFIG.HEADERS });
+                        const data = await response.json();
+                        setCartas(data.items);
+                    } catch(error) {
+                        console.log(error);
+                    }
+                }
+                obtenerCartas();
+            }, []);
+
+            // Aplicar clase al body para el tema
+            useEffect(() => {
+                if (isDarkMode) {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            }, [isDarkMode]);
+
+            const toggleTheme = () => setIsDarkMode(!isDarkMode);
+
+            return (
+                <>
+                    <Header cartas={cartasMostradas} toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
+                    <main>
+                        <div style={{ textAlign: 'center', margin: '1rem' }}>
+                            <label>
+                                <strong class="color">Mostrar {limite} cartas (de {cartas.length} disponibles)</strong>
+                                <input 
+                                    type="range" 
+                                    min="1" 
+                                    max={cartas.length || 1} 
+                                    value={limite} 
+                                    onChange={(e) => setLimite(Number(e.target.value))}
+                                    style={{ marginLeft: '10px', width: '200px' }}
+                                />
+                            </label>
+                        </div>
+                        <CofreSorpresa cartas={cartas} />
+                        <div id="cards-container">
+                            {cartasMostradas.map(carta => (
+                                <CartaClashRoyale 
+                                    key={carta.name} 
+                                    nombre={carta.name} 
+                                    nivelMax={carta.maxLevel} 
+                                    rareza={rarezas[carta.rarity]} 
+                                    urlFoto={carta.iconUrls.medium} 
+                                    urlHeroe={carta.iconUrls.heroMedium || ""} 
+                                    urlEvo={carta.iconUrls.evolutionMedium || ""}
+                                />
+                            ))}
+                        </div>
+                    </main>
+                    <Footer />
+                </>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
